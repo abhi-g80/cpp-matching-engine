@@ -31,6 +31,9 @@ class Order
         
         friend std::ostream& operator<<( std::ostream&, const Order& );
 
+        void set_order_quantity(long quantity) { this->quantity = quantity; }
+        void set_order_price(double price) {this->price = price; }
+
     private:
         uint64_t orderid;
         string symbol;

@@ -15,9 +15,11 @@ class Market : public Instrument
 
         bool market_insert_order(Order&);
         bool market_delete_order(Order&);
-        //bool market_modify_order(Order&);
+        void market_modify_order(Order::Side, uint64_t, double, long);
         Order& market_find_order(Order::Side, uint64_t);
         void market_display_book () const;
+        void market_order_match(Order&);
+        void market_trade_dispatch(long, double);
 
     private:
         using BidOrders = std::multimap<double, Order, std::greater<double>>;
@@ -72,6 +74,16 @@ Order& Market::market_find_order(Order::Side side, uint64_t id)
     throw std::exception();
 }
 
+void Market::market_modify_order(Order::Side side, uint64_t id, double price, long quantity)
+{
+    Order& order = market_find_order(side, id);
+
+    order.set_order_quantity(quantity);
+
+    order.set_order_price(price);
+
+}
+
 bool Market::market_delete_order(Order& order)
 {
     uint64_t id = order.get_order_id();
@@ -104,6 +116,97 @@ bool Market::market_delete_order(Order& order)
 
         return false;
     }
+}
+
+void Market::market_order_match(Order & _order)
+{
+    Order & order = market_find_order(_order.get_order_side(), _order.get_order_id());
+
+    double price = order.get_order_price();
+    long quantity = order.get_order_quantity();
+    long traded_quantity = 0;
+
+    if(order.get_order_side() == Order::Side::Bid)
+    {
+        auto curr_best_ask = market_ask_orders.begin();
+
+        while(price >= curr_best_ask->first && quantity != 0)
+        {
+            long curr_best_quantity = curr_best_ask->second.get_order_quantity();
+
+            if(quantity > curr_best_quantity)
+            {
+                traded_quantity = curr_best_quantity;
+                market_trade_dispatch(traded_quantity, curr_best_ask->second.get_order_price());
+                market_delete_order(curr_best_ask->second);
+                quantity -= traded_quantity;
+                order.set_order_quantity(quantity);
+                curr_best_ask = market_ask_orders.begin();
+            }
+            else if (quantity == curr_best_quantity)
+            {
+                traded_quantity = quantity;
+                market_trade_dispatch(traded_quantity, curr_best_ask->second.get_order_price());
+                market_delete_order(order);
+                market_delete_order(curr_best_ask->second);
+                quantity = 0;
+                break;
+            }
+            else
+            {
+                traded_quantity = quantity;
+                market_trade_dispatch(traded_quantity, curr_best_ask->second.get_order_price());
+                market_delete_order(order);
+                curr_best_ask->second.set_order_quantity(curr_best_quantity - traded_quantity);
+                quantity = 0;
+                break;                
+            }
+        }
+    }
+    else
+    {
+        auto curr_best_bid = market_bid_orders.begin();
+
+        while(price <= curr_best_bid->first && quantity != 0)
+        {
+            long curr_best_quantity = curr_best_bid->second.get_order_quantity();
+
+            if(quantity > curr_best_quantity)
+            {
+                traded_quantity = curr_best_quantity;
+                market_trade_dispatch(traded_quantity, curr_best_bid->second.get_order_price());
+                market_delete_order(curr_best_bid->second);
+                quantity -= traded_quantity;
+                order.set_order_quantity(quantity);
+                curr_best_bid = market_bid_orders.begin();
+            }
+            else if (quantity == curr_best_quantity)
+            {
+                traded_quantity = quantity;
+                market_trade_dispatch(traded_quantity, curr_best_bid->second.get_order_price());
+                market_delete_order(order);
+                market_delete_order(curr_best_bid->second);
+                quantity = 0;
+                break;
+            }
+            else
+            {
+                traded_quantity = quantity;
+                market_trade_dispatch(traded_quantity, curr_best_bid->second.get_order_price());
+                market_delete_order(order);
+                curr_best_bid->second.set_order_quantity(curr_best_quantity - traded_quantity);
+                quantity = 0;
+                break;                
+            }
+        }
+    }   
+}
+
+void Market::market_trade_dispatch(long quantity, double price)
+{
+    std::cout << "Trade on " << get_instrument_symbol() << ": "
+              << "Price = " << price << ", Quantity = " << quantity
+              << std::endl;
 }
 
 void Market::market_display_book () const
