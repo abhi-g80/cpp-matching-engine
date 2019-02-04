@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Order order1(908787, "FDAX", Order::Side::Bid, 
     	Order::Type::Limit , 87.50, 1000);
 
-    std::cout << order1;
+    std::cout << order1 << std::endl;
 
     //   Create some orders
     //     Bid        Ask 
@@ -73,8 +73,7 @@ int main(int argc, char *argv[])
    	market.market_display_book();
 
    	// Delete order 908790
-   	std::cout << "Deleting order = " << order4;
-
+   	std::cout << "Deleting order = " << order4 <<std::endl;
 
    	market.market_delete_order(order4);
 
@@ -83,6 +82,40 @@ int main(int argc, char *argv[])
    	std::cout << "Finding order side Ask, Id 908791 = "
    			  << market.market_find_order(Order::Side::Ask, 908791)
    			  << std::endl;
+
+    // Modify order
+
+    std::cout << "Modifying order side Ask, Id 908791 " << std::endl; 
+    
+    market.market_modify_order(Order::Side::Ask, 908791, 93, 8001);
+
+    market.market_display_book();
+
+    std::cout << order5 << std::endl;
+
+    // Add order to match
+
+    Order order10(908796, "FDAX", Order::Side::Bid, 
+      Order::Type::Limit , 88, 3000);
+
+    market.market_insert_order(order10);
+
+    market.market_display_book();
+
+    market.market_order_match(order10);
+
+    market.market_display_book();
+
+    Order order11(908799, "FDAX", Order::Side::Ask, 
+      Order::Type::Limit , 87.5, 3000);
+
+    market.market_insert_order(order11);
+
+    market.market_display_book();
+
+    market.market_order_match(order11);
+
+    market.market_display_book();
 
     return 0;
 }
