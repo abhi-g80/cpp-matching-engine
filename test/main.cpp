@@ -39,6 +39,13 @@ int main(int argc, char *argv[])
     	Order::Type::Limit , 86.00, 6552);
 
 
+    std::cout << "Modify order6 object" << std::endl;
+
+    order6.set_order_price(85.5);
+    order6.set_order_quantity(8557);
+
+    std::cout << "Modified order " << order6 << std::endl;
+
    	// Create the market
 
    	Market market(2387, "FDAX");
@@ -85,9 +92,9 @@ int main(int argc, char *argv[])
 
     // Modify order
 
-    std::cout << "Modifying order side Ask, Id 908791 " << std::endl; 
+    std::cout << "Modifying order Id 908794 " << order8 << std::endl; 
     
-    market.market_modify_order(Order::Side::Ask, 908791, 93, 8001);
+    market.market_modify_order(Order::Side::Bid, 908794, 84.5, 7001);
 
     market.market_display_book();
 
