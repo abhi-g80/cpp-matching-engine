@@ -2,13 +2,14 @@
 #include <map>
 #include "order.hpp"
 #include "instrument.hpp"
+#include "idGenerator.hpp"
 
 using string = std::string;
 
-class Market : public Instrument
+class Market : public Instrument, public IDGenerator
 {
     public:
-        Market(uint32_t id, string symbol) : Instrument(id, symbol) 
+        Market(uint32_t id, string symbol) : Instrument(id, symbol), IDGenerator(id)
         {
 
         }
