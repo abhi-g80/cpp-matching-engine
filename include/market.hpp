@@ -82,6 +82,11 @@ void Market::market_modify_order(Order::Side side, uint64_t id, double price, lo
 
     order.set_order_price(price);
 
+    Order order_cpy = order;
+
+    market_delete_order(order);
+
+    market_insert_order(order_cpy);
 }
 
 bool Market::market_delete_order(Order& order)
