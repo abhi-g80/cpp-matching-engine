@@ -5,14 +5,14 @@ class IDGenerator
 {
 	private:
 		uint64_t order_id;
-		uint64_t trade_id;
-		uint32_t market_id; // currently market_id equals instrument.id
+		uint64_t execution_id;
+		uint32_t market_id = 0; // currently market_id equals instrument.id
 
 	public:
 		IDGenerator(uint32_t market_id)
 		{
 			this->order_id = 0;
-			this->trade_id = 0;
+			this->execution_id = 0;
 			this->market_id = market_id;
 		}
 
@@ -29,12 +29,12 @@ class IDGenerator
 			}
 		}
 
-		uint64_t generate_trade_id(uint32_t market_id)
+		uint64_t generate_execution_id(uint32_t market_id)
 		{
 			if (this->market_id != 0)
 			{
-				++trade_id;
-				return trade_id;
+				++execution_id;
+				return execution_id;
 			}
 			else
 			{

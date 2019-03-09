@@ -34,12 +34,15 @@ bool Market::market_insert_order(Order& order)
 {
     try
     {
+        order.set_order_id(generate_order_id(get_instrument_id()));
+
         if(order.get_order_side() == Order::Side::Bid)
             market_bid_orders.insert(std::pair<double, Order> (order.get_order_price(),
                                                                order));
         else
             market_ask_orders.insert(std::pair<double, Order> (order.get_order_price(),
                                                                order));
+
         return true;
     }
     catch (const std::exception &e)
